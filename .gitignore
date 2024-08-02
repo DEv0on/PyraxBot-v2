@@ -29,5 +29,6 @@ target/
 #idea
 .idea/
 
-
+#env
+.env
 
