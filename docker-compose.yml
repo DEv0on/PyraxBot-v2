@@ -1,0 +1,36 @@
+services:
+  leader:
+    image: leader:latest
+    container_name: leader
+    hostname: leader
+    networks:
+      - bot
+  worker:
+    image: worker:latest
+    container_name: worker
+    hostname: worker
+    networks:
+      - bot
+  coordinator:
+    image: middleware:latest
+    container_name: coordinator
+    hostname: coordinator
+    networks:
+      - bot
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: "discordbot"
+      RABBITMQ_DEFAULT_PASS: "discordbot"
+    ports:
+      - 15672:15672
+      - 5672:5672
+    networks:
+      - bot
+
+networks:
+  bot:
+    driver: bridge
+    name: bot
