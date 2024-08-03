@@ -57,6 +57,7 @@ class CommandEventListenerFactory {
             ApplicationCommandOption.Type.CHANNEL -> option.value.map(ApplicationCommandInteractionOptionValue::asChannel)
             ApplicationCommandOption.Type.ROLE -> option.value.map(ApplicationCommandInteractionOptionValue::asRole)
             ApplicationCommandOption.Type.NUMBER -> option.value.map(ApplicationCommandInteractionOptionValue::asDouble)
+            ApplicationCommandOption.Type.ATTACHMENT -> option.value.map(ApplicationCommandInteractionOptionValue::asAttachment)
             else -> throw IllegalArgumentException("Unknown option type ${option.type}")
         }
     }
