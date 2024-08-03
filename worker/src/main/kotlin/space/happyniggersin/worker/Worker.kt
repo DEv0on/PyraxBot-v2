@@ -16,18 +16,14 @@ import discord4j.connect.rsocket.router.RSocketRouter
 import discord4j.connect.rsocket.router.RSocketRouterOptions
 import discord4j.core.DiscordClient
 import discord4j.core.GatewayDiscordClient
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.core.event.domain.lifecycle.ReadyEvent
 import discord4j.core.shard.MemberRequestFilter
 import discord4j.core.shard.ShardingStrategy
 import discord4j.store.api.readonly.ReadOnlyStoreService
 import discord4j.store.redis.RedisStoreService
 import io.lettuce.core.RedisClient
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
-import reactor.core.publisher.Mono
-import reactor.util.Logger
-import reactor.util.Loggers
 import java.net.InetSocketAddress
 
 @Component
@@ -44,6 +40,9 @@ class Worker {
         val rabbitmqPass: String? = System.getenv("RABBITMQ_DEFAULT_PASS")
 
     }
+
+    @Autowired
+    private lateinit var eventHandler: EventHandler
 
     @Bean
     fun workerApp(): GatewayDiscordClient {
@@ -99,49 +98,10 @@ class Worker {
             .blockOptional()
             .orElseThrow(::RuntimeException)
 
-        NoBotSupport.create(client)
-            .eventHandlers()
-            .block()
-        rabbitMQ.close()
+        client.on(eventHandler)
+            .then().subscribe()
 
         return client
     }
 
-    class NoBotSupport internal constructor(private val client: GatewayDiscordClient) {
-        fun eventHandlers(): Mono<Void> {
-            return Mono.`when`(readyHandler(client), ciInteractionHandler(client))
-        }
-
-        companion object {
-            private val log: Logger = Loggers.getLogger(NoBotSupport::class.java)
-
-            fun create(client: GatewayDiscordClient): NoBotSupport {
-                return NoBotSupport(client)
-            }
-
-            fun readyHandler(client: GatewayDiscordClient): Mono<Void> {
-                return client.on(ReadyEvent::class.java)
-                    .doOnNext { ready: ReadyEvent ->
-                        log.info(
-                            "Shard [{}] logged in as {}",
-                            ready.shardInfo,
-                            ready.self.username
-                        )
-                    }
-                    .then()
-            }
-
-            fun ciInteractionHandler(client: GatewayDiscordClient): Mono<Void> {
-                return client.on(ChatInputInteractionEvent::class.java)
-                    .flatMap {
-                        Mono.`when`(chatInputInteractionEvent(it))
-                    }.then()
-            }
-
-            fun chatInputInteractionEvent(event: ChatInputInteractionEvent): Mono<Void> {
-                log.info(event.toString())
-                return event.deferReply()
-            }
-        }
-    }
 }

@@ -10,34 +10,10 @@ services:
     depends_on:
       global-router:
         condition: service_started
-      shard-coordinator:
-        condition: service_started
       rabbitmq:
         condition: service_healthy
       redis-cache:
         condition: service_healthy
-  leader2:
-    image: leader:latest
-    container_name: leader2
-    hostname: leader2
-    env_file:
-      - .env
-    networks:
-      - bot
-    depends_on:
-      leader:
-        condition: service_started
-  leader3:
-    image: leader:latest
-    container_name: leader3
-    hostname: leader3
-    env_file:
-      - .env
-    networks:
-      - bot
-    depends_on:
-      leader:
-        condition: service_started
   worker:
     image: worker:latest
     container_name: worker
@@ -49,54 +25,6 @@ services:
     depends_on:
       leader:
         condition: service_started
-  worker2:
-    image: worker:latest
-    container_name: worker2
-    hostname: worker2
-    networks:
-      - bot
-    env_file:
-      - .env
-    depends_on:
-      leader:
-        condition: service_started
-
-  worker3:
-    image: worker:latest
-    container_name: worker3
-    hostname: worker3
-    networks:
-      - bot
-    env_file:
-      - .env
-    depends_on:
-      leader:
-        condition: service_started
-
-  worker4:
-    image: worker:latest
-    container_name: worker4
-    hostname: worker4
-    networks:
-      - bot
-    env_file:
-      - .env
-    depends_on:
-      leader:
-        condition: service_started
-
-  worker5:
-    image: worker:latest
-    container_name: worker5
-    hostname: worker5
-    networks:
-      - bot
-    env_file:
-      - .env
-    depends_on:
-      leader:
-        condition: service_started
-
 
   global-router:
     image: globalrouter:latest
