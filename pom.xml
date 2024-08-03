@@ -11,10 +11,6 @@
     <name>discordbot</name>
     <url>http://maven.apache.org</url>
     <repositories>
-        <repository>
-            <id>maven-central</id>
-            <url>https://repo1.maven.org/maven2/</url>
-        </repository>
     </repositories>
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
@@ -22,36 +18,13 @@
         <kotlin.version>1.9.24</kotlin.version>
         <spring.version>3.3.2</spring.version>
         <lombok.version>1.18.34</lombok.version>
-        <revision>1.0.1-SNAPSHOT</revision>
+        <discord4j.version>3.2.6</discord4j.version>
+        <discord4j.connect.version>0.7.0-SNAPSHOT</discord4j.connect.version>
+        <discord4j.stores.version>3.2.2</discord4j.stores.version>
+        <projectreactor.version>3.6.4</projectreactor.version>
+        <revision>1.0.2-SNAPSHOT</revision>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>com.discord4j</groupId>
-            <artifactId>discord4j-core</artifactId>
-            <version>3.2.6</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.discord4j</groupId>
-            <artifactId>connect-common</artifactId>
-            <version>0.6.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.discord4j</groupId>
-            <artifactId>connect-rabbitmq</artifactId>
-            <version>0.6.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.discord4j</groupId>
-            <artifactId>connect-rsocket</artifactId>
-            <version>0.6.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.discord4j</groupId>
-            <artifactId>stores-redis</artifactId>
-            <version>3.2.2</version>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -90,40 +63,21 @@
             <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <version>${spring.version}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.10.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test-junit5</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <modules>
-        <module>middleware</module>
+        <module>shardcoordinator</module>
+        <module>globalrouter</module>
         <module>worker</module>
         <module>leader</module>
         <module>common</module>
     </modules>
     <build>
-        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.7.1</version>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -132,6 +86,7 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
                 <configuration>
                     <jvmTarget>21</jvmTarget>
                     <args>
@@ -151,18 +106,6 @@
                         <configuration>
                             <sourceDirs>
                                 <sourceDir>src/main/kotlin</sourceDir>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>src/test/kotlin</sourceDir>
                             </sourceDirs>
                         </configuration>
                     </execution>

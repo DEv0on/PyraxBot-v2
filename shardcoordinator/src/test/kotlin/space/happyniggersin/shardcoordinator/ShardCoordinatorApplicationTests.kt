@@ -1,10 +1,10 @@
-package space.happyniggersin.middleware
+package space.happyniggersin.shardcoordinator
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
-@SpringBootTest
-class MiddlewareApplicationTests {
+//@SpringBootTest
+class ShardCoordinatorApplicationTests {
 
     @Test
     fun contextLoads() {

@@ -9,9 +9,26 @@
     <version>${revision}</version>
   </parent>
 
-  <artifactId>middleware</artifactId>
-  <name>middleware</name>
-  <description>middleware</description>
+  <artifactId>globalrouter</artifactId>
+  <name>Global Router</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.discord4j</groupId>
+      <artifactId>discord4j-core</artifactId>
+      <version>${discord4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.discord4j</groupId>
+      <artifactId>connect-rsocket</artifactId>
+      <version>${discord4j.connect.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.projectreactor</groupId>
+      <artifactId>reactor-core</artifactId>
+      <version>${projectreactor.version}</version>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
@@ -19,7 +36,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
-          <mainClass>space.happyniggersin.middleware.MiddlewareApplicationKt</mainClass>
+          <mainClass>space.happyniggersin.globalrouter.GlobalRouterApplicationKt</mainClass>
           <excludes>
             <exclude>
               <groupId>org.projectlombok</groupId>

@@ -1,11 +1,11 @@
-package space.happyniggersin.middleware
+package space.happyniggersin.globalrouter
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class MiddlewareApplication
+class GlobalRouterApplication
 
 fun main(args: Array<String>) {
-    runApplication<MiddlewareApplication>(*args)
+    runApplication<GlobalRouterApplication>(*args)
 }
