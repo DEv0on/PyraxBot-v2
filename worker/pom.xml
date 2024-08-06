@@ -37,6 +37,26 @@
             <groupId>com.discord4j</groupId>
             <artifactId>connect-rsocket</artifactId>
             <version>${discord4j.connect.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.rsocket</groupId>
+                    <artifactId>rsocket-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.rsocket</groupId>
+                    <artifactId>rsocket-transport-netty</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.rsocket</groupId>
+            <artifactId>rsocket-core</artifactId>
+            <version>1.1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>io.rsocket</groupId>
+            <artifactId>rsocket-transport-netty</artifactId>
+            <version>1.1.4</version>
         </dependency>
         <dependency>
             <groupId>com.discord4j</groupId>
@@ -52,17 +72,34 @@
         <dependency>
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
-            <version>6.1.8.RELEASE</version>
+            <version>6.2.4.RELEASE</version>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+                <version>0.10.2</version>
+                <configuration>
+                    <mainClass>space.happyniggersin.worker.WorkerApplication</mainClass>
+                    <buildArgs>
+                        <buildArg>--initialize-at-run-time=sun.net.dns.ResolverConfigurationImpl</buildArg>
+                    </buildArgs>
+                    <metadataRepository>
+                        <enabled>true</enabled>
+                    </metadataRepository>
+                    <jvmArgs>
+                        <jvmArg>-XX:+UnlockExperimentalVMOptions</jvmArg>
+                    </jvmArgs>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>space.happyniggersin.worker.WorkerApplicationKt</mainClass>
+                    <mainClass>space.happyniggersin.worker.WorkerApplication</mainClass>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
@@ -98,4 +135,62 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <image>
+                                <builder>paketobuildpacks/builder:tiny</builder>
+                                <buildpacks>
+                                    <buildpack>gcr.io/paketo-buildpacks/graalvm</buildpack>
+                                    <buildpack>gcr.io/paketo-buildpacks/java-native-image</buildpack>
+                                </buildpacks>
+                                <env>
+                                    <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+                                </env>
+                            </image>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>process-aot</id>
+                                <goals>
+                                    <goal>process-aot</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <configuration>
+                            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+                            <metadataRepository>
+                                <enabled>true</enabled>
+                            </metadataRepository>
+                            <requiredVersion>22.3</requiredVersion>
+                            <buildArgs>
+                                <buildArg>--initialize-at-run-time=sun.net.dns.ResolverConfigurationImpl</buildArg>
+                            </buildArgs>
+                            <jvmArgs>
+                                <jvmArg>-XX:+UnlockExperimentalVMOptions</jvmArg>
+                            </jvmArgs>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>add-reachability-metadata</id>
+                                <goals>
+                                    <goal>add-reachability-metadata</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
