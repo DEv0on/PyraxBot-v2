@@ -70,6 +70,7 @@
         <module>worker</module>
         <module>leader</module>
         <module>common</module>
+        <module>command-publisher</module>
     </modules>
     <build>
         <plugins>
