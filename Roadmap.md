@@ -9,7 +9,7 @@
   - [ ] Mute
   - [ ] Ban
 - [ ] Szkodniki i inne role
-  - [x] Komenda do dodawania
+  - [ ] Komenda do dodawania
   - [ ] Komenda do usuwania
   - [ ] Role czasowe
   - [ ] Automatyczne przypisywanie przy wejściu ponownym na serwer
