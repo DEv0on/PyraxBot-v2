@@ -14,7 +14,7 @@
   - [ ] Role czasowe
   - [ ] Automatyczne przypisywanie przy wejściu ponownym na serwer
   - [ ] Automatyczna ranga frytkas przy wejściu na serwer
-- [ ] Propozycje
+- [x] Propozycje*
 - [ ] Pepper (jeśli rozkminie API)
   - [ ] https://pepper.pl/graphql
 - [ ] System leveli
@@ -23,8 +23,8 @@
 - [ ] Blokowanie URL z whitelistą
   - [ ] Blokowanie
   - [ ] Whitelista
-- [ ] Zabawy
-  - [ ] Ostatnia litera
+- [x] Zabawy*
+  - [x] Ostatnia litera*
 - [ ] Dashboard (ewentualnie)
   - [ ] Custom komendy "slash"
   - [ ] Wysyłanie wiadomosci botem
@@ -32,3 +32,5 @@
   - [ ] Apelacje o kary
   - [ ] Podania rekrutacja
   - [ ] Panel zarządzania szkodnikami
+
+* - baza danych do dodania
