@@ -1,6 +1,6 @@
 ### Roadmap.md
 
-- [ ] zlotemomenty (do dogadania)
+- [x] zlotemomenty (do dogadania)
 - [ ] ticket
 - [ ] Automatyczne kanały VC
 - [ ] System kar
