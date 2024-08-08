@@ -83,11 +83,9 @@
         <dependency>
             <groupId>space.happyniggersin</groupId>
             <artifactId>common</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
-            <scope>compile</scope>
+            <version>${revision}</version>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

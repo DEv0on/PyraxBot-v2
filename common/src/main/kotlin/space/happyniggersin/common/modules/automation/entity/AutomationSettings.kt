@@ -2,7 +2,7 @@ package space.happyniggersin.common.modules.automation.entity
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
-import space.happyniggersin.common.modules.automation.types.ChannelSetting
+import space.happyniggersin.common.modules.automation.channels.ChannelSetting
 
 @Document(collection = "automation_settings")
 class AutomationSettings() {

@@ -1,4 +1,4 @@
-package space.happyniggersin.worker.event.command
+package space.happyniggersin.common.event.command
 
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.beans.factory.config.BeanPostProcessor
@@ -7,10 +7,9 @@ import org.springframework.core.annotation.AnnotatedElementUtils
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
-import space.happyniggersin.worker.annotation.command.Command
-import space.happyniggersin.worker.annotation.command.Subcommand
+import space.happyniggersin.common.annotation.command.Command
+import space.happyniggersin.common.annotation.command.Subcommand
 import java.lang.reflect.Method
-import java.util.*
 
 @Component
 class CommandBeanPostProcess : BeanPostProcessor {

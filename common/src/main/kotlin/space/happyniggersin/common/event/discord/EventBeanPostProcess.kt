@@ -1,11 +1,11 @@
-package space.happyniggersin.worker.event.discord
+package space.happyniggersin.common.event.discord
 
 import discord4j.core.event.domain.Event
 import org.springframework.beans.factory.config.BeanPostProcessor
 import org.springframework.core.MethodIntrospector
 import org.springframework.core.annotation.AnnotatedElementUtils
 import org.springframework.stereotype.Component
-import space.happyniggersin.worker.annotation.event.DiscordEventListener
+import space.happyniggersin.common.annotation.event.DiscordEventListener
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 

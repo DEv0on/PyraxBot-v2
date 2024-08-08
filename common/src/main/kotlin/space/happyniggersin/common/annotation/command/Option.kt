@@ -1,4 +1,4 @@
-package space.happyniggersin.worker.annotation.command
+package space.happyniggersin.common.annotation.command
 
 import org.springframework.aot.hint.annotation.Reflective
 

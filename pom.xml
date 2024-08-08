@@ -19,7 +19,7 @@
         <spring.version>3.3.2</spring.version>
         <lombok.version>1.18.34</lombok.version>
         <discord4j.version>3.3.0-RC1</discord4j.version>
-        <discord4j.connect.version>0.7.0-SNAPSHOT</discord4j.connect.version>
+        <discord4j.connect.version>0.7.1-SNAPSHOT</discord4j.connect.version>
         <discord4j.stores.version>3.2.2</discord4j.stores.version>
         <projectreactor.version>3.6.4</projectreactor.version>
         <revision>1.0.2-SNAPSHOT</revision>

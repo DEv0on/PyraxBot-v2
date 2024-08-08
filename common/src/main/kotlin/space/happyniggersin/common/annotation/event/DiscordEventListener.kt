@@ -1,4 +1,4 @@
-package space.happyniggersin.worker.annotation.event
+package space.happyniggersin.common.annotation.event
 
 import discord4j.core.event.domain.Event
 import kotlin.reflect.KClass

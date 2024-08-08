@@ -1,18 +1,21 @@
-package space.happyniggersin.common.modules.automation.types
+package space.happyniggersin.common.modules.automation.channels
 
 import discord4j.common.util.Snowflake
 import discord4j.core.event.domain.message.MessageCreateEvent
 import discord4j.core.`object`.reaction.ReactionEmoji
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import space.happyniggersin.common.event.discord.DiscordEvent
 
-class AutoReactionChannel(channelId: Long) : ChannelSetting(channelId) {
+class AutoReactionChannel(channelId: Long) : ChannelSetting(channelId, 1) {
     var emotes: MutableList<Emoji> = mutableListOf()
 
-    override fun execute(event: MessageCreateEvent): Mono<Void> {
+    override fun execute(event: DiscordEvent<MessageCreateEvent>): Mono<Void> {
+        if (event.getCancelled()) return Mono.empty()
+
         return Flux.fromIterable(emotes.asIterable())
             .flatMap { emote ->
-                event.message.addReaction(emote.getEmojiData())
+                event.event.message.addReaction(emote.getEmojiData())
             }
             .then()
     }

@@ -1,4 +1,4 @@
-package space.happyniggersin.worker.event.command
+package space.happyniggersin.common.event.command
 
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.core.`object`.command.ApplicationCommandInteractionOption
@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.AnnotatedElementUtils
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
-import space.happyniggersin.worker.annotation.command.Option
+import space.happyniggersin.common.annotation.command.Option
 import java.lang.reflect.Method
 import java.util.*
 import java.util.stream.IntStream
@@ -19,6 +19,7 @@ class CommandEventListenerFactory {
 
     @Autowired
     private lateinit var ctx: ApplicationContext
+
     @Autowired
     private lateinit var commandProcessor: CommandBeanPostProcess
 
@@ -40,7 +41,7 @@ class CommandEventListenerFactory {
         return method.parameters
             .toList()
             .toTypedArray()
-            .slice(1 until Math.min(method.parameters.size, options.size+1))
+            .slice(1 until Math.min(method.parameters.size, options.size + 1))
             .map { field ->
                 val optionName = AnnotatedElementUtils.findMergedAnnotation(field, Option::class.java)!!.name
                 val option = options.find { it.name == optionName } ?: return@map Optional.empty<Any>()
@@ -49,7 +50,7 @@ class CommandEventListenerFactory {
     }
 
     fun getCastedOptional(option: ApplicationCommandInteractionOption): Optional<Any> {
-        return when(option.type) {
+        return when (option.type) {
             ApplicationCommandOption.Type.STRING -> option.value.map(ApplicationCommandInteractionOptionValue::asString)
             ApplicationCommandOption.Type.INTEGER -> option.value.map(ApplicationCommandInteractionOptionValue::asLong)
             ApplicationCommandOption.Type.BOOLEAN -> option.value.map(ApplicationCommandInteractionOptionValue::asBoolean)
@@ -62,7 +63,10 @@ class CommandEventListenerFactory {
         }
     }
 
-    fun getOptions(options: List<ApplicationCommandInteractionOption>, nodes: MutableList<String>): List<ApplicationCommandInteractionOption> {
+    fun getOptions(
+        options: List<ApplicationCommandInteractionOption>,
+        nodes: MutableList<String>
+    ): List<ApplicationCommandInteractionOption> {
         var option = options.firstOrNull() ?: return emptyList()
         nodes.removeFirst()
 
@@ -79,7 +83,8 @@ class CommandEventListenerFactory {
     }
 
     fun getCommandName(options: List<ApplicationCommandInteractionOption>, nodes: MutableList<String>) {
-        val subCommand = options.firstOrNull { it.type == ApplicationCommandOption.Type.SUB_COMMAND || it.type == ApplicationCommandOption.Type.SUB_COMMAND_GROUP }
+        val subCommand =
+            options.firstOrNull { it.type == ApplicationCommandOption.Type.SUB_COMMAND || it.type == ApplicationCommandOption.Type.SUB_COMMAND_GROUP }
         if (subCommand != null) {
             nodes.add(subCommand.name)
             if (subCommand.type == ApplicationCommandOption.Type.SUB_COMMAND_GROUP) {
