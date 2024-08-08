@@ -10,8 +10,6 @@ class AutoReactionChannel(channelId: Long) : ChannelSetting(channelId) {
     var emotes: MutableList<Emoji> = mutableListOf()
 
     override fun execute(event: MessageCreateEvent): Mono<Void> {
-        if (event.message.attachments.size == 0) return event.message.delete()
-
         return Flux.fromIterable(emotes.asIterable())
             .flatMap { emote ->
                 event.message.addReaction(emote.getEmojiData())
