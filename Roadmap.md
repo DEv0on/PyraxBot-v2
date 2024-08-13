@@ -13,8 +13,8 @@
   - [ ] Komenda do usuwania
   - [ ] Role czasowe
   - [ ] Automatyczne przypisywanie przy wejściu ponownym na serwer
-  - [ ] Automatyczna ranga frytkas przy wejściu na serwer
-- [x] Propozycje*
+- [ ] Automatyczna jakakolwiek rola przy wejściu
+- [x] Propozycje
 - [ ] Pepper (jeśli rozkminie API)
   - [ ] https://pepper.pl/graphql
 - [ ] System leveli
@@ -32,5 +32,3 @@
   - [ ] Apelacje o kary
   - [ ] Podania rekrutacja
   - [ ] Panel zarządzania szkodnikami
-
-* - baza danych do dodania
