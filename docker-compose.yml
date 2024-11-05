@@ -87,10 +87,11 @@ services:
     ports:
       - 27017:27017
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo mongodb:27017/test --quiet 1
-      interval: 10s
+      test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 5s
     networks:
       - bot
 networks:
