@@ -79,11 +79,9 @@ class Worker {
             .setStore(
                 Store.fromLayout(
                     LegacyStoreLayout.of(
-                        ReadOnlyStoreService(
-                            RedisStoreService.builder()
-                                .redisClient(redisClient)
-                                .build()
-                        )
+                        RedisStoreService.builder()
+                            .redisClient(redisClient)
+                            .build()
                     )
                 )
             )

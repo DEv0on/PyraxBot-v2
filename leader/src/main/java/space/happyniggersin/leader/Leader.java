@@ -21,6 +21,7 @@ import discord4j.core.event.dispatch.DispatchEventMapper;
 import discord4j.core.shard.ShardingStrategy;
 import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
+import discord4j.store.api.readonly.ReadOnlyStoreService;
 import discord4j.store.redis.RedisStoreService;
 import io.lettuce.core.RedisClient;
 import org.springframework.context.annotation.Bean;
@@ -73,10 +74,10 @@ public class Leader {
                         Intent.DIRECT_MESSAGE_TYPING))
                 .setEnabledIntents(IntentSet.all())
                 .setDispatchEventMapper(DispatchEventMapper.discardEvents())
-                .setStore(Store.fromLayout(LegacyStoreLayout.of(RedisStoreService.builder()
+                .setStore(Store.fromLayout(LegacyStoreLayout.of(new ReadOnlyStoreService(RedisStoreService.builder()
                         .redisClient(redisClient)
                         .useSharedConnection(false)
-                        .build())))
+                        .build()))))
                 .setExtraOptions(o -> new ConnectGatewayOptions(o,
                         RabbitMQPayloadSink.create(sink, rabbitMQ),
                         RabbitMQPayloadSource.create(source, rabbitMQ, "gateway")))
