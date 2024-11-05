@@ -1,6 +1,7 @@
 package space.happyniggersin.common.modules.privatechannels.service
 
 import discord4j.common.util.Snowflake
+import discord4j.core.`object`.entity.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,6 +23,11 @@ class PrivateChannelService {
     fun getOrCreateVoiceChannel(userId: Snowflake): Mono<PrivateChannel> {
         return channelRepository.findById(userId.asLong())
             .switchIfEmpty(channelRepository.save(PrivateChannel(userId.asLong())))
+    }
+
+    @Transactional
+    fun getVoiceChannelByChannelId(channelId: Snowflake): Mono<PrivateChannel> {
+        return channelRepository.findByChannelId(channelId.asLong())
     }
 
     @Transactional

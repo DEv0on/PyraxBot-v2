@@ -1,5 +1,6 @@
 package space.happyniggersin.common.modules.privatechannels.entity
 
+import discord4j.core.`object`.entity.User
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
@@ -14,5 +15,10 @@ class PrivateChannelSettings() {
 
     constructor(guildId: Long): this() {
         this.guildId = guildId
+    }
+
+    fun getName(user: User): String {
+        return this.voiceDefaultName
+            .replace("%user%", user.username)
     }
 }
