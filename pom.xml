@@ -22,6 +22,7 @@
         <discord4j.connect.version>0.7.1-SNAPSHOT</discord4j.connect.version>
         <discord4j.stores.version>3.2.2</discord4j.stores.version>
         <projectreactor.version>3.6.4</projectreactor.version>
+        <lettuce.version>6.2.4.RELEASE</lettuce.version>
         <revision>1.0.2-SNAPSHOT</revision>
     </properties>
     <dependencies>
@@ -49,11 +50,6 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
 

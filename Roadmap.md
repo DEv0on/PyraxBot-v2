@@ -2,7 +2,7 @@
 
 - [x] zlotemomenty (do dogadania)
 - [ ] ticket
-- [ ] Automatyczne kanały VC
+- [x] Automatyczne kanały VC
 - [ ] System kar
   - [ ] System case'ów
   - [ ] Warn
@@ -23,8 +23,8 @@
 - [ ] Blokowanie URL z whitelistą
   - [ ] Blokowanie
   - [ ] Whitelista
-- [x] Zabawy*
-  - [x] Ostatnia litera*
+- [ ] Zabawy*
+  - [ ] Ostatnia litera*
 - [ ] Dashboard (ewentualnie)
   - [ ] Custom komendy "slash"
   - [ ] Wysyłanie wiadomosci botem
