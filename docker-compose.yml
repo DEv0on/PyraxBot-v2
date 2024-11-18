@@ -8,6 +8,7 @@ services:
       - .env
     networks:
       - bot
+      - external
     depends_on:
       global-router:
         condition: service_started
@@ -21,12 +22,12 @@ services:
     hostname: worker
     networks:
       - bot
+      - external
     env_file:
       - .env
     depends_on:
       leader:
         condition: service_started
-
   global-router:
     image: pyraxbot/globalrouter:1.0.0-SNAPSHOT
     container_name: globalrouter
@@ -100,8 +101,12 @@ services:
     networks:
       - bot
 networks:
+  external:
+    driver: bridge
+    name: external
   bot:
     driver: bridge
+    internal: true
     name: bot
 volumes:
   mongodb-data:
