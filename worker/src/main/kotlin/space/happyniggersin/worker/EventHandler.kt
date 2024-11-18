@@ -7,15 +7,16 @@ import org.reactivestreams.Publisher
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
-import space.happyniggersin.common.event.discord.DiscordEvent
 import space.happyniggersin.common.event.command.CommandEventListenerFactory
+import space.happyniggersin.common.event.discord.DiscordEvent
 import space.happyniggersin.common.event.discord.EventBeanPostProcess
 
 @Component
-class EventHandler: ReactiveEventAdapter() {
+class EventHandler : ReactiveEventAdapter() {
 
     @Autowired
     private lateinit var commandFactory: CommandEventListenerFactory
+
     @Autowired
     private lateinit var eventFactory: EventBeanPostProcess
 
@@ -26,11 +27,12 @@ class EventHandler: ReactiveEventAdapter() {
             val listeners = eventFactory.registeredEvents.getOrDefault(event::class, listOf())
             val dEvent = DiscordEvent(event, listeners.any { it.cancellable })
 
-            return Flux.concat(listeners
-                .sortedBy { it.order }
-                .map { listener ->
-                    return@map listener.call(dEvent)
-                })
+            return Flux.concat(
+                listeners
+                    .sortedBy { it.order }
+                    .map { listener ->
+                        return@map listener.call(dEvent)
+                    })
         }
     }
 }

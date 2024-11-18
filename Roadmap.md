@@ -1,7 +1,9 @@
 ### Roadmap.md
 
 - [x] zlotemomenty (do dogadania)
-- [ ] ticket
+- [x] Ticket system
+  - [ ] Transkrypty
+  - [ ] Ticket channel default permissions
 - [x] Automatyczne kanały VC
 - [ ] System kar
   - [ ] System case'ów
@@ -23,8 +25,8 @@
 - [ ] Blokowanie URL z whitelistą
   - [ ] Blokowanie
   - [ ] Whitelista
-- [ ] Zabawy*
-  - [ ] Ostatnia litera*
+- [x] Zabawy*
+  - [x] Ostatnia litera*
 - [ ] Dashboard (ewentualnie)
   - [ ] Custom komendy "slash"
   - [ ] Wysyłanie wiadomosci botem
