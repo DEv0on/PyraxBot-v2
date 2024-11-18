@@ -1,14 +1,17 @@
-# Compiled class file
-*.class
+# Ignore Gradle project-specific cache directory
+.gradle
 
-# Log file
-*.log
+# Ignore Gradle build output directory
+build
 
-# BlueJ files
-*.ctxt
+.idea
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+#idea
+.idea/
+
+#env
+.env*
+!.env.example
 
 # Package Files #
 *.jar
@@ -23,12 +26,8 @@
 hs_err_pid*
 replay_pid*
 
-#mvn
-target/
+# Compiled class file
+*.class
 
-#idea
-.idea/
-
-#env
-.env
-
+# Log file
+*.log

@@ -18,7 +18,6 @@ import discord4j.core.DiscordClient
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.shard.MemberRequestFilter
 import discord4j.core.shard.ShardingStrategy
-import discord4j.store.api.readonly.ReadOnlyStoreService
 import discord4j.store.redis.RedisStoreService
 import io.lettuce.core.RedisClient
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,7 +37,6 @@ class Worker {
         val rabbitmqPort = (System.getenv("RABBITMQ_PORT") ?: "5672").toInt()
         val rabbitmqUser: String? = System.getenv("RABBITMQ_DEFAULT_USER")
         val rabbitmqPass: String? = System.getenv("RABBITMQ_DEFAULT_PASS")
-
     }
 
     @Autowired

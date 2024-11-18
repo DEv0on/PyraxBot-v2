@@ -6,7 +6,6 @@ import discord4j.core.event.domain.VoiceStateUpdateEvent
 import discord4j.core.event.domain.channel.VoiceChannelDeleteEvent
 import discord4j.core.spec.GuildMemberEditSpec
 import discord4j.core.spec.VoiceChannelCreateSpec
-import org.reactivestreams.Publisher
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -50,7 +49,7 @@ class PrivateVoiceListener {
     fun execute(event: DiscordEvent<VoiceStateUpdateEvent>, settings: PrivateChannelSettings): Mono<Void> {
         val current = event.event.current
         val old = event.event.old
-        if (event.event.isLeaveEvent && old.isPresent) {
+        if (event.event.isLeaveEvent) {
             return old.get().channel
                 .flatMap {
                     it.voiceStates.count().zipWith(Mono.just(it))
@@ -68,9 +67,7 @@ class PrivateVoiceListener {
         } else if (event.event.hasJoinedChannel(Snowflake.of(settings.channelId))) {
             return gateway.getGuildById(Snowflake.of(settings.guildId))
                 .zipWith(privateChannelService.getOrCreateVoiceChannel(current.userId))
-                .zipWhen {
-                    current.member
-                }
+                .zipWhen { current.member }
                 .flatMap {
                     if (it.t1.t2.exist)
                         return@flatMap it.t2.edit(

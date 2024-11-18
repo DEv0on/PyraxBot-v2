@@ -1,7 +1,7 @@
 name: bot
 services:
   leader:
-    image: leader:latest
+    image: pyraxbot/leader:1.0.0-SNAPSHOT
     container_name: leader
     hostname: leader
     env_file:
@@ -16,7 +16,7 @@ services:
       redis-cache:
         condition: service_healthy
   worker:
-    image: worker:latest
+    image: pyraxbot/worker:1.0.0-SNAPSHOT
     container_name: worker
     hostname: worker
     networks:
@@ -28,7 +28,7 @@ services:
         condition: service_started
 
   global-router:
-    image: globalrouter:latest
+    image: pyraxbot/globalrouter:1.0.0-SNAPSHOT
     container_name: globalrouter
     hostname: globalrouter
     ports:
@@ -38,7 +38,7 @@ services:
     networks:
       - bot
   shard-coordinator:
-    image: shardcoordinator:latest
+    image: pyraxbot/shardcoordinator:1.0.0-SNAPSHOT
     container_name: shardcoordinator
     hostname: shardcoordinator
     ports:
@@ -89,6 +89,8 @@ services:
       - .env
     ports:
       - 27017:27017
+    volumes:
+      - mongodb-data:/data/db
     healthcheck:
       test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 5s
@@ -101,3 +103,5 @@ networks:
   bot:
     driver: bridge
     name: bot
+volumes:
+  mongodb-data:
