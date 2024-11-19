@@ -27,10 +27,8 @@ class CommandEventListenerFactory {
         val commandName = getCommandName(event)
         val method = commandProcessor.findMethod(commandName.joinToString(".")) ?: return Mono.empty()
         val bean = ctx.getBean(method.declaringClass) ?: return Mono.empty()
-        val options = getOptions(
-            event.options,
-            commandName.sliceArray(1 until commandName.size).toMutableList()
-        )
+        val nodes = commandName.sliceArray(1 until commandName.size).toMutableList()
+        val options = if (nodes.size > 0) getOptions(event.options, nodes) else event.options
 
         val resolvedOptions = resolveOptions(method, bean, options).toTypedArray()
 

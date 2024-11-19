@@ -53,139 +53,147 @@ class TicketListener {
                 if (event.event.interaction.guildId.isEmpty)
                     return Mono.empty()
 
-                val user = event.event.interaction.user
-
-                return event.event.deferReply()
-                    .withEphemeral(true)
-                    .then(ticketService.getOrCreateSettings(event.event.interaction.guildId.get()))
-                    .flatMap {
-                        if (!it.enabled || it.categoryId == -1L)
-                            return@flatMap Mono.error(CommandInvokeException(event.event, "Module disabled"))
-                        else
-                            return@flatMap Mono.just(it)
-                    }
-                    .zipWith(ticketService.getOrCreateTicket(user.id))
-                    .flatMap {
-                        if (it.t2.channelId != 0L)
-                            return@flatMap Mono.error(CommandInvokeException(event.event, "Ticket already created"))
-                        else
-                            return@flatMap Mono.just(it)
-                    }
-                    .zipWhen { event.event.interaction.guild }
-                    .flatMap { tuple ->
-                        val guild = tuple.t2
-                        val settings = tuple.t1.t1
-                        val ticket = tuple.t1.t2
-                        return@flatMap guild.createTextChannel(
-                            getChannelName(
-                                settings.channelName,
-                                user
-                            )
-                        )
-                            .withPermissionOverwrites(
-                                PermissionOverwrite.forMember(
-                                    user.id, PermissionSet.of(
-                                        Permission.VIEW_CHANNEL,
-                                        Permission.SEND_MESSAGES
-                                    ), PermissionSet.of()
-                                )
-                            )
-                            .withParentId(Snowflake.of(settings.categoryId))
-                            .flatMap { channel ->
-                                ticket.channelId = channel.id.asLong()
-
-                                ticketService.updateTicket(ticket)
-                                    .then(
-                                        channel.createMessage(
-                                            MessageCreateSpec.builder()
-                                                .content(user.mention)
-                                                .allowedMentions(
-                                                    AllowedMentions.builder().allowUser(user.id).build()
-                                                )
-                                                .embeds(
-                                                    settings.ticketEmbed.toEmbed()
-                                                )
-                                                .components(
-                                                    ActionRow.of(
-                                                        Button.danger(
-                                                            "ticket-close-${user.id.asString()}",
-                                                            settings.ticketCloseButtonText
-                                                        )
-                                                    )
-                                                )
-                                                .build()
-                                        )
-
-                                    )
-
-                            }
-                            .then(event.event.embedReply("Pomyślnie utworzono ticket", Color.GREEN))
-                    }
-                    .onErrorResume(CommandInvokeException::class.java) { error: CommandInvokeException ->
-                        return@onErrorResume error.handleException()
-                    }
+                return handleCreateButton(event.event)
             }
 
             "close" -> {
-                return event.event.deferReply()
-                    .withEphemeral(true)
-                    .then(ticketService.getOrCreateSettings(event.event.interaction.guildId.get()))
-                    .flatMap {
-                        event.event.editReply(
-                            InteractionReplyEditSpec.create()
-                                .withEmbeds(
-                                    it.ticketCloseConfirmationEmbed.toEmbed()
-                                )
-                                .withComponents(
-                                    ActionRow.of(
-                                        Button.danger(
-                                            "ticket-delete-confirm",
-                                            it.ticketCloseConfirmButtonText
-                                        ),
-                                        Button.secondary(
-                                            "ticket-delete-discard",
-                                            it.ticketCloseDiscardButtonText
-                                        )
-                                    )
-                                )
-                        )
-                    }
-                    .flatMap {
-                        client.on(ButtonInteractionEvent::class.java) { buttonEvent ->
-                            if (!buttonEvent.customId.startsWith("ticket-delete"))
-                                return@on Mono.empty()
-                            if (buttonEvent.customId.equals("ticket-delete-confirm")) {
-                                return@on buttonEvent.reply("")
-                                    .then(buttonEvent.interaction.channel)
-                                    .flatMap {
-                                        ticketService.deleteTicket(buttonEvent.interaction.channelId)
-                                            .then(Mono.just(it))
-                                    }
-                                    .flatMap { it.delete() }
-                            } else {
-                                return@on buttonEvent.deferReply()
-                                    .withEphemeral(true)
-                                    .then(Mono.fromCallable {
-                                        if (buttonEvent.interaction.message.isEmpty) return@fromCallable Mono.empty()
-
-                                        return@fromCallable buttonEvent.interaction.message.get().delete()
-                                    })
-                                    .flatMap {
-                                        event.event.deleteReply()
-                                            .then(buttonEvent.embedReply("Anulowano", ephemeral = true))
-                                    }
-                            }
-                        }
-                            .timeout(Duration.ofSeconds(30))
-                            .onErrorResume(TimeoutException::class.java) {
-                                event.event.deleteReply()
-                            }
-                            .then()
-                    }
+                return handleCloseButton(event.event)
             }
 
             else -> return Mono.empty()
         }
+    }
+
+    fun handleCloseButton(event: ButtonInteractionEvent): Mono<Void> {
+        return event.deferReply()
+            .withEphemeral(true)
+            .then(ticketService.getOrCreateSettings(event.interaction.guildId.get()))
+            .flatMap {
+                event.editReply(
+                    InteractionReplyEditSpec.create()
+                        .withEmbeds(
+                            it.ticketCloseConfirmationEmbed.toEmbed()
+                        )
+                        .withComponents(
+                            ActionRow.of(
+                                Button.danger(
+                                    "ticket-delete-confirm",
+                                    it.ticketCloseConfirmButtonText
+                                ),
+                                Button.secondary(
+                                    "ticket-delete-discard",
+                                    it.ticketCloseDiscardButtonText
+                                )
+                            )
+                        )
+                )
+            }
+            .flatMap {
+                client.on(ButtonInteractionEvent::class.java) { buttonEvent ->
+                    if (!buttonEvent.customId.startsWith("ticket-delete"))
+                        return@on Mono.empty()
+                    if (buttonEvent.customId.equals("ticket-delete-confirm")) {
+                        return@on buttonEvent.reply("")
+                            .then(buttonEvent.interaction.channel)
+                            .flatMap {
+                                ticketService.deleteTicket(buttonEvent.interaction.channelId)
+                                    .then(Mono.just(it))
+                            }
+                            .flatMap { it.delete() }
+                    } else {
+                        return@on buttonEvent.deferReply()
+                            .withEphemeral(true)
+                            .then(Mono.fromCallable {
+                                if (buttonEvent.interaction.message.isEmpty) return@fromCallable Mono.empty()
+
+                                return@fromCallable buttonEvent.interaction.message.get().delete()
+                            })
+                            .flatMap {
+                                event.deleteReply()
+                                    .then(buttonEvent.embedReply("Anulowano", ephemeral = true))
+                            }
+                    }
+                }
+                    .timeout(Duration.ofSeconds(30))
+                    .onErrorResume(TimeoutException::class.java) {
+                        event.deleteReply()
+                    }
+                    .then()
+            }
+    }
+
+    fun handleCreateButton(event: ButtonInteractionEvent): Mono<Void> {
+        val user = event.interaction.user
+
+        return event.deferReply()
+            .withEphemeral(true)
+            .then(ticketService.getOrCreateSettings(event.interaction.guildId.get()))
+            .flatMap {
+                if (!it.enabled || it.categoryId == -1L)
+                    return@flatMap Mono.error(CommandInvokeException(event, "Module disabled"))
+                else
+                    return@flatMap Mono.just(it)
+            }
+            .zipWith(ticketService.getOrCreateTicket(user.id))
+            .flatMap {
+                if (it.t2.channelId != 0L)
+                    return@flatMap Mono.error(CommandInvokeException(event, "Ticket already created"))
+                else
+                    return@flatMap Mono.just(it)
+            }
+            .zipWhen { event.interaction.guild }
+            .flatMap { tuple ->
+                val guild = tuple.t2
+                val settings = tuple.t1.t1
+                val ticket = tuple.t1.t2
+                return@flatMap guild.createTextChannel(
+                    getChannelName(
+                        settings.channelName,
+                        user
+                    )
+                )
+                    .withPermissionOverwrites(
+                        PermissionOverwrite.forMember(
+                            user.id, PermissionSet.of(
+                                Permission.VIEW_CHANNEL,
+                                Permission.SEND_MESSAGES
+                            ), PermissionSet.of()
+                        )
+                    )
+                    .withParentId(Snowflake.of(settings.categoryId))
+                    .flatMap { channel ->
+                        ticket.channelId = channel.id.asLong()
+
+                        ticketService.updateTicket(ticket)
+                            .then(
+                                channel.createMessage(
+                                    MessageCreateSpec.builder()
+                                        .content(user.mention)
+                                        .allowedMentions(
+                                            AllowedMentions.builder().allowUser(user.id).build()
+                                        )
+                                        .embeds(
+                                            settings.ticketEmbed.toEmbed()
+                                        )
+                                        .components(
+                                            ActionRow.of(
+                                                Button.danger(
+                                                    "ticket-close-${user.id.asString()}",
+                                                    settings.ticketCloseButtonText
+                                                )
+                                            )
+                                        )
+                                        .build()
+                                )
+
+                            )
+
+                    }
+                    .then(event.embedReply("Pomyślnie utworzono ticket", Color.GREEN))
+            }
+            .onErrorResume(CommandInvokeException::class.java) { error: CommandInvokeException ->
+                return@onErrorResume error.handleException()
+            }
     }
 
     fun getChannelName(format: String, user: User): String {

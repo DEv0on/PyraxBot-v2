@@ -21,6 +21,10 @@ configure(subprojects - project(":common")) {
     tasks.withType<BootBuildImage> {
         imageName = "${rootProject.name.lowercase()}/${project.name}:${properties["pyraxbot.version"]}"
         createdDate = ISO8601Utils.format(Date())
+        environment.putAll(mapOf(
+            "BPE_DELIM_JAVA_TOOL_OPTIONS" to " ",
+            "BPE_APPEND_JAVA_TOOL_OPTIONS" to "-XX:MaxDirectMemorySize=1000M"
+        ))
     }
 }
 
@@ -31,6 +35,7 @@ subprojects {
     repositories {
         mavenCentral()
         mavenLocal()
+
     }
 
     dependencies {
