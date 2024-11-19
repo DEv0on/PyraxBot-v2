@@ -72,7 +72,7 @@ class TicketListener {
                 event.editReply(
                     InteractionReplyEditSpec.create()
                         .withEmbeds(
-                            it.ticketCloseConfirmationEmbed.toEmbed()
+                            it.ticketCloseConfirmationEmbed.toOriginal()
                         )
                         .withComponents(
                             ActionRow.of(
@@ -92,8 +92,11 @@ class TicketListener {
                 client.on(ButtonInteractionEvent::class.java) { buttonEvent ->
                     if (!buttonEvent.customId.startsWith("ticket-delete"))
                         return@on Mono.empty()
-                    if (buttonEvent.customId.equals("ticket-delete-confirm")) {
-                        return@on buttonEvent.reply("")
+                    if (buttonEvent.customId == "ticket-delete-confirm") {
+                        return@on buttonEvent
+                            .deferReply()
+                            .withEphemeral(true)
+                            .then(event.editReply(""))
                             .then(buttonEvent.interaction.channel)
                             .flatMap {
                                 ticketService.deleteTicket(buttonEvent.interaction.channelId)
@@ -152,19 +155,21 @@ class TicketListener {
                         user
                     )
                 )
-                    .withPermissionOverwrites(
-                        PermissionOverwrite.forMember(
-                            user.id, PermissionSet.of(
-                                Permission.VIEW_CHANNEL,
-                                Permission.SEND_MESSAGES
-                            ), PermissionSet.of()
-                        )
-                    )
                     .withParentId(Snowflake.of(settings.categoryId))
                     .flatMap { channel ->
                         ticket.channelId = channel.id.asLong()
 
                         ticketService.updateTicket(ticket)
+                            .then(
+                                channel.addMemberOverwrite(
+                                    user.id, PermissionOverwrite.forMember(
+                                        user.id, PermissionSet.of(
+                                            Permission.VIEW_CHANNEL,
+                                            Permission.SEND_MESSAGES
+                                        ), PermissionSet.of()
+                                    )
+                                )
+                            )
                             .then(
                                 channel.createMessage(
                                     MessageCreateSpec.builder()
@@ -173,7 +178,7 @@ class TicketListener {
                                             AllowedMentions.builder().allowUser(user.id).build()
                                         )
                                         .embeds(
-                                            settings.ticketEmbed.toEmbed()
+                                            settings.ticketEmbed.toOriginal()
                                         )
                                         .components(
                                             ActionRow.of(
@@ -190,9 +195,6 @@ class TicketListener {
 
                     }
                     .then(event.embedReply("Pomyślnie utworzono ticket", Color.GREEN))
-            }
-            .onErrorResume(CommandInvokeException::class.java) { error: CommandInvokeException ->
-                return@onErrorResume error.handleException()
             }
     }
 

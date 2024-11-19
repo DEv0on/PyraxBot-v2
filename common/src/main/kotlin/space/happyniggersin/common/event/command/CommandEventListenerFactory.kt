@@ -10,6 +10,7 @@ import org.springframework.core.annotation.AnnotatedElementUtils
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import space.happyniggersin.common.annotation.command.Option
+import space.happyniggersin.common.exception.CommandInvokeException
 import java.lang.reflect.Method
 import java.util.*
 import java.util.stream.IntStream
@@ -32,7 +33,11 @@ class CommandEventListenerFactory {
 
         val resolvedOptions = resolveOptions(method, bean, options).toTypedArray()
 
-        return method.invoke(bean, event, *resolvedOptions) as Mono<Void>
+        return (method.invoke(bean, event, *resolvedOptions) as Mono<Void>)
+            .onErrorResume(CommandInvokeException::class.java) {
+                return@onErrorResume it.handleException().then(Mono.empty())
+            }
+
     }
 
     fun resolveOptions(method: Method, bean: Any, options: List<ApplicationCommandInteractionOption>): List<Any> {

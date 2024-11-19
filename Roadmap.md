@@ -22,6 +22,9 @@
 - [ ] System leveli
 - [ ] Ekonomia (może)
 - [ ] Głosowania sejmowe
+- [x] Music Module
+  - [ ] Disconnect on empty channel or queue empty
+  - [ ] Commands
 - [ ] Blokowanie URL z whitelistą
   - [ ] Blokowanie
   - [ ] Whitelista
