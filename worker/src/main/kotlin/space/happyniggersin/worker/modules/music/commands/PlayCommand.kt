@@ -26,9 +26,6 @@ class PlayCommand {
             .defaultIfEmpty(VoidVoiceConnection())
             .flatMap { joinChannel(event) }
             .then(processTrack(event, track))
-            .onErrorResume(CommandInvokeException::class.java) {
-                it.handleException()
-            }
     }
 
     fun joinChannel(event: ChatInputInteractionEvent): Mono<Void> {
