@@ -4,6 +4,7 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.core.`object`.command.ApplicationCommandInteractionOption
 import discord4j.core.`object`.command.ApplicationCommandInteractionOptionValue
 import discord4j.core.`object`.command.ApplicationCommandOption
+import discord4j.rest.http.client.ClientException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.AnnotatedElementUtils
@@ -34,8 +35,11 @@ class CommandEventListenerFactory {
         val resolvedOptions = resolveOptions(method, bean, options).toTypedArray()
 
         return (method.invoke(bean, event, *resolvedOptions) as Mono<Void>)
+            .onErrorResume(ClientException::class.java) {
+                Mono.empty()
+            }
             .onErrorResume(CommandInvokeException::class.java) {
-                return@onErrorResume it.handleException().then(Mono.empty())
+                it.handleException().then(Mono.empty())
             }
 
     }
