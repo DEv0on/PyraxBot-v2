@@ -194,6 +194,9 @@ class TicketListener {
                             )
 
                     }
+                    .onErrorResume(CommandInvokeException::class.java) {
+                        return@onErrorResume it.handleException().then(Mono.empty())
+                    }
                     .then(event.embedReply("Pomyślnie utworzono ticket", Color.GREEN))
             }
     }
