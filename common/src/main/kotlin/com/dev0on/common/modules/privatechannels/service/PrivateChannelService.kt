@@ -1,7 +1,6 @@
 package com.dev0on.common.modules.privatechannels.service
 
 import discord4j.common.util.Snowflake
-import discord4j.core.`object`.entity.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

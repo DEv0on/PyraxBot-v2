@@ -7,8 +7,8 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import com.dev0on.common.event.discord.DiscordEvent
 
-class AutoReactionChannel(channelId: Long) : com.dev0on.common.modules.automation.channels.ChannelSetting(channelId, 1) {
-    var emotes: MutableList<com.dev0on.common.modules.automation.channels.AutoReactionChannel.Emoji> = mutableListOf()
+class AutoReactionChannel(channelId: Long) : ChannelSetting(channelId, 1) {
+    var emotes: MutableList<AutoReactionChannel.Emoji> = mutableListOf()
 
     override fun execute(event: DiscordEvent<MessageCreateEvent>): Mono<Void> {
         if (event.getCancelled()) return Mono.empty()
