@@ -89,6 +89,7 @@ class TicketListener {
                 )
             }
             .flatMap {
+                var deleted = false
                 client.on(ButtonInteractionEvent::class.java) { buttonEvent ->
                     if (!buttonEvent.customId.startsWith("ticket-delete"))
                         return@on Mono.empty()
@@ -102,7 +103,10 @@ class TicketListener {
                                 ticketService.deleteTicket(buttonEvent.interaction.channelId)
                                     .then(Mono.just(it))
                             }
-                            .flatMap { it.delete() }
+                            .flatMap {
+                                deleted = true
+                                it.delete()
+                            }
                     } else {
                         return@on buttonEvent.deferReply()
                             .withEphemeral(true)
@@ -112,16 +116,19 @@ class TicketListener {
                                 return@fromCallable buttonEvent.interaction.message.get().delete()
                             })
                             .flatMap {
-                                event.deleteReply()
-                                    .then(buttonEvent.embedReply("Anulowano", ephemeral = true))
+                                    event.deleteReply()
+                                        .then(buttonEvent.embedReply("Anulowano", ephemeral = true))
                             }
                     }
                 }
                     .timeout(Duration.ofSeconds(30))
                     .onErrorResume(TimeoutException::class.java) {
-                        event.deleteReply()
+                        if (!deleted)
+                            return@onErrorResume event.deleteReply()
+                        return@onErrorResume Mono.empty()
                     }
                     .then()
+
             }
     }
 
