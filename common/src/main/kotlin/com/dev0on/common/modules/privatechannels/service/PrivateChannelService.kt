@@ -66,4 +66,8 @@ class PrivateChannelService {
         return settingsRepository.findById(guildId.asLong())
             .switchIfEmpty(settingsRepository.save(PrivateChannelSettings(guildId.asLong())))
     }
+
+    fun doesChannelExist(channelId: Snowflake): Mono<Boolean> {
+        return channelRepository.existsPrivateChannelByChannelId(channelId.asLong())
+    }
 }

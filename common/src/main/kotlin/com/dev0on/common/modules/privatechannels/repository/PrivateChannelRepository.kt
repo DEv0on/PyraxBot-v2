@@ -8,4 +8,5 @@ import com.dev0on.common.modules.privatechannels.entity.PrivateChannel
 @Component
 interface PrivateChannelRepository: ReactiveCrudRepository<PrivateChannel, Long> {
     fun findByChannelId(channelId: Long): Mono<PrivateChannel>
+    fun existsPrivateChannelByChannelId(channelId: Long): Mono<Boolean>
 }
