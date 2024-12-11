@@ -7,55 +7,79 @@ import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import com.dev0on.common.event.discord.DiscordEvent
 import com.dev0on.common.modules.automation.videoapi.VideoService
+import dev.arbjerg.lavalink.client.Link
+import discord4j.rest.util.AllowedMentions
 import java.io.ByteArrayInputStream
 import java.net.URI
+import java.util.regex.Pattern
 
-class IgTtConvertingChannel(channelId: Long): ChannelSetting(channelId, 1) {
+class IgTtConvertingChannel(channelId: Long) : ChannelSetting(channelId, 1) {
+
     override fun execute(event: DiscordEvent<MessageCreateEvent>): Mono<Void> {
         if (event.getCancelled()) return Mono.empty()
 
         val msg = event.event.message.content
 
         event.setCancelled(true)
-        return event.event.message.delete().then(Mono.defer {
-            val msgSpl = msg.split("/")
-            if (msg.contains("vm.tiktok.com")) {
-                if (msgSpl.size < 4)
-                    return@defer Mono.empty()
-                return@defer downloadVideoAndSend(event, Endpoint.TIKTOK_SHORT, msgSpl[3], null)
-            } else if(msg.contains("www.tiktok.com")) {
-                if (msgSpl.size < 6)
-                    return@defer Mono.empty()
 
-                return@defer downloadVideoAndSend(event, Endpoint.TIKTOK, msgSpl[5], msgSpl[3].replace("@", ""))
-            } else if(msg.contains("instagram.com/reel") || msg.contains("instagram.com/p")) {
-                if (msgSpl.size < 5)
-                    return@defer Mono.empty()
+        val matcher = LinkOnlyChannel.URL_REGEX.matcher(msg)
+        if (!matcher.find()) return Mono.empty()
 
-                return@defer downloadVideoAndSend(event, Endpoint.REEL, msgSpl[4], null)
+        when (matcher.group("domain")) {
+            "vm.tiktok.com" -> {
+                val id = matcher.group("path").replace("/", "")
+                return downloadVideoAndSend(event, Endpoint.TIKTOK_SHORT, id,null)
             }
-            return@defer Mono.empty()
-        })
+            "www.tiktok.com" -> {
+                val username = matcher.group("path").split("/").first().replace("@", "")
+                val id = matcher.group("path").split("/").last()
+                return downloadVideoAndSend(event, Endpoint.TIKTOK, id, username)
+            }
+            "instagram.com", "www.instagram.com" -> {
+                val path = matcher.group("path")
+                if (!path.startsWith("/reel") && !path.startsWith("/p")) return Mono.empty()
+
+                val id = path.split("/")[2]
+                return downloadVideoAndSend(event, Endpoint.REEL, id, null)
+            }
+            else -> return Mono.empty()
+        }
     }
 
-    private fun downloadVideoAndSend(event: DiscordEvent<MessageCreateEvent>, endpoint: Endpoint, id: String, username: String?): Mono<Void> {
-        val videoApi = when(endpoint) {
-            Endpoint.TIKTOK ->  VideoService.client.getVideo(username!!, id)
+    private fun downloadVideoAndSend(
+        event: DiscordEvent<MessageCreateEvent>,
+        endpoint: Endpoint,
+        id: String,
+        username: String?
+    ): Mono<Void> {
+        val videoApi = when (endpoint) {
+            Endpoint.TIKTOK -> VideoService.client.getVideo(username!!, id)
             Endpoint.TIKTOK_SHORT -> VideoService.client.getShortVideo(id)
             Endpoint.REEL -> VideoService.client.getReel(id)
         }
-
-        return videoApi
+        val author = event.event.message.author.get()
+        val content = event.event.message.content
+        val mentions = AllowedMentions.builder().allowUser(*event.event.message.userMentions.map {it.id}.toTypedArray()).build()
+        return event.event.message.delete()
+            .then(videoApi)
             .zipWith(event.event.message.channel)
             .publishOn(Schedulers.boundedElastic())
             .flatMap { tuple ->
                 val url = URI(tuple.t1.video_url).toURL()
                 url.openStream().use {
-                    return@flatMap tuple.t2.createMessage(MessageCreateSpec.builder()
-                        .addFile(
-                            MessageCreateFields.File.of("video.mp4", ByteArrayInputStream(it.readAllBytes()))
-                        )
-                        .build())
+                    return@flatMap tuple.t2.createMessage(
+                        MessageCreateSpec.builder()
+                            .content("""
+                                `${event.event.message.author.get().username}:`
+                                
+                                ${content.replace(LinkOnlyChannel.URL_REGEX.toRegex(), "")}
+                            """.trimIndent())
+                            .addFile(
+                                MessageCreateFields.File.of("video.mp4", ByteArrayInputStream(it.readAllBytes()))
+                            )
+                            .allowedMentions(mentions)
+                            .build()
+                    )
                 }
             }.then()
     }

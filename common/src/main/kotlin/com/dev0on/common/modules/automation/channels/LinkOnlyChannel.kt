@@ -7,7 +7,7 @@ import java.util.regex.Pattern
 
 class LinkOnlyChannel(channelId: Long): ChannelSetting(channelId, 0) {
     companion object {
-        private val URL_REGEX = Pattern.compile("(https?://(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.\\S{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.\\S{2,}|https?://(?:www\\.|(?!www))[a-zA-Z0-9]+\\.\\S{2,}|www\\.[a-zA-Z0-9]+\\.\\S{2,})")
+        val URL_REGEX = Pattern.compile("(?<protocol>http[s]?:\\/\\/)?(?<domain>[^\\/\\s]+)(?<path>\\/.*)")
     }
 
     override fun execute(event: DiscordEvent<MessageCreateEvent>): Mono<Void> {
