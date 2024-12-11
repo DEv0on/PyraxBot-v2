@@ -70,7 +70,7 @@ class IgTtConvertingChannel(channelId: Long) : ChannelSetting(channelId, 1) {
                     return@flatMap tuple.t2.createMessage(
                         MessageCreateSpec.builder()
                             .content("""
-                                `${event.event.message.author.get().username}:`
+                                `${author.username}:`
                                 
                                 ${content.replace(LinkOnlyChannel.URL_REGEX.toRegex(), "")}
                             """.trimIndent())
